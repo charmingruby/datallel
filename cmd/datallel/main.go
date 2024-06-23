@@ -1,8 +1,14 @@
 package main
 
-import simulationworker "github.com/charmingruby/datallel/internal/worker/simulation_worker"
+import (
+	"runtime"
+
+	simulationworker "github.com/charmingruby/datallel/internal/worker/simulation_worker"
+)
 
 func main() {
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
 	// simulates data
 	data := []simulationworker.SimulationPayload{}
 	for i := 0; i < 1000; i++ {
