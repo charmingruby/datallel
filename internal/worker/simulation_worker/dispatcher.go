@@ -13,16 +13,18 @@ func ProcessSimulationData(data []SimulationPayload, concurrency int) []Simulati
 	var dataWg sync.WaitGroup
 	var mutex sync.Mutex
 
+	var successCount int
+
 	for i := 0; i < concurrency; i++ {
 		dataWg.Add(1)
 		go func() {
 			defer dataWg.Done()
-			SimulationWorker(i, dataCh, resultCh)
+			SimulationWorker(i, dataCh, resultCh, &mutex, &successCount)
 		}()
 	}
 
 	// enqueue jobs
-	for i := 0; i < dataSize-1; i++ {
+	for i := 0; i < dataSize; i++ {
 		dataCh <- data[i]
 	}
 	close(dataCh)
@@ -35,15 +37,15 @@ func ProcessSimulationData(data []SimulationPayload, concurrency int) []Simulati
 	resultsWithErr := []SimulationResult{}
 
 	for result := range resultCh {
-		mutex.Lock()
 		if !result.Processed {
 			resultsWithErr = append(resultsWithErr, result)
 		}
-		mutex.Unlock()
 
 		isProcessed := strconv.FormatBool(result.Processed)
 		fmt.Printf("UserID `%d`, Processed? %s, by: Worker #%d\n", result.UserID, isProcessed, result.ProcessedBy)
 	}
+
+	fmt.Printf("%d items processed successfully!\n", successCount)
 
 	return resultsWithErr
 }

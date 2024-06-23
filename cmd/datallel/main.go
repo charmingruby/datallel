@@ -5,14 +5,14 @@ import simulationworker "github.com/charmingruby/datallel/internal/worker/simula
 func main() {
 	// simulates data
 	data := []simulationworker.SimulationPayload{}
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 1000; i++ {
 		payload := simulationworker.SimulationPayload{
 			UserID: i,
 			Status: "Waiting",
 		}
 		data = append(data, payload)
 	}
-	concurrency := 4
+	concurrency := 10
 
 	simulationworker.ProcessSimulationData(data, concurrency)
 }
